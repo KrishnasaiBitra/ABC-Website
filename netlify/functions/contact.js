@@ -1,5 +1,6 @@
 // netlify/functions/contact.js
 
+const nodemailer = require("nodemailer");
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 exports.handler = async function (event) {
@@ -26,44 +27,68 @@ exports.handler = async function (event) {
     return { statusCode: 400, body: JSON.stringify({ success: false, message: errors[0] }) };
   }
 
-  const EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID;
-  const EMAILJS_TEMPLATE_ID_COMPANY = process.env.EMAILJS_TEMPLATE_ID_COMPANY;
-  const EMAILJS_TEMPLATE_ID_CONFIRM = process.env.EMAILJS_TEMPLATE_ID_CONFIRM;
-  const EMAILJS_PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY;
-  const EMAILJS_PRIVATE_KEY = process.env.EMAILJS_PRIVATE_KEY;
+  const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com";
+  const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
+  const SMTP_USER = process.env.SMTP_USER;
+  const SMTP_PASS = process.env.SMTP_PASS;
+  const COMPANY_EMAIL = process.env.COMPANY_EMAIL || "info@whitestone.in";
 
-  const emailjsUrl = "https://api.emailjs.com/api/v1.0/email/send";
-
-  async function sendEmail(templateId, templateParams) {
-    const res = await fetch(emailjsUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        service_id: EMAILJS_SERVICE_ID,
-        template_id: templateId,
-        user_id: EMAILJS_PUBLIC_KEY,
-        accessToken: EMAILJS_PRIVATE_KEY,
-        template_params: templateParams
-      })
-    });
-    if (!res.ok) throw new Error(`EmailJS error: ${res.status}`);
+  if (!SMTP_USER || !SMTP_PASS) {
+    console.error("Missing SMTP credentials.");
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ success: false, message: "Email service is not configured. Please set SMTP credentials." })
+    };
   }
+
+  const transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465, // true for 465, false for 587
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASS
+    }
+  });
 
   try {
     // Email 1: Notify the company about the new enquiry
-    await sendEmail(EMAILJS_TEMPLATE_ID_COMPANY, {
-      from_name: fullName.trim(),
-      from_email: email.trim(),
-      subject: subject.trim(),
-      message: message.trim(),
-      to_email: "info@whitestone.in"
+    await transporter.sendMail({
+      from: `"${fullName.trim()}" <${SMTP_USER}>`,
+      to: COMPANY_EMAIL,
+      replyTo: email.trim(),
+      subject: `New Contact Enquiry: ${subject.trim()}`,
+      text: `You have received a new contact enquiry from your website.\n\n` +
+            `Name: ${fullName.trim()}\n` +
+            `Email: ${email.trim()}\n` +
+            `Subject: ${subject.trim()}\n\n` +
+            `Message:\n${message.trim()}`,
+      html: `<p>You have received a new contact enquiry from your website.</p>` +
+            `<p><strong>Name:</strong> ${fullName.trim()}<br>` +
+            `<strong>Email:</strong> ${email.trim()}<br>` +
+            `<strong>Subject:</strong> ${subject.trim()}</p>` +
+            `<p><strong>Message:</strong><br>${message.trim().replace(/\n/g, "<br>")}</p>`
     });
 
-    // Email 2: Confirmation to the person who submitted the form
-    await sendEmail(EMAILJS_TEMPLATE_ID_CONFIRM, {
-      to_name: fullName.trim(),
-      to_email: email.trim(),
-      subject: subject.trim()
+    // Email 2: Confirmation response to the person who submitted the form
+    await transporter.sendMail({
+      from: `"ABC Solutions Company" <${SMTP_USER}>`,
+      to: email.trim(),
+      subject: `Thank you for contacting us: ${subject.trim()}`,
+      text: `Dear ${fullName.trim()},\n\n` +
+            `Thank you for reaching out to ABC Solutions Company Pvt. Ltd.\n\n` +
+            `We have received your message regarding "${subject.trim()}". Our team will review your enquiry and get back to you within 24 hours.\n\n` +
+            `Best regards,\n` +
+            `Banking Technology Team\n` +
+            `ABC Solutions Company Pvt. Ltd.\n` +
+            `Dharmapuri, Tamil Nadu, India`,
+      html: `<p>Dear ${fullName.trim()},</p>` +
+            `<p>Thank you for reaching out to ABC Solutions Company Pvt. Ltd.</p>` +
+            `<p>We have received your message regarding "<strong>${subject.trim()}</strong>". Our team will review your enquiry and get back to you within 24 hours.</p>` +
+            `<p>Best regards,<br>` +
+            `<strong>Banking Technology Team</strong><br>` +
+            `ABC Solutions Company Pvt. Ltd.<br>` +
+            `Dharmapuri, Tamil Nadu, India</p>`
     });
 
     return {
@@ -74,7 +99,7 @@ exports.handler = async function (event) {
       })
     };
   } catch (error) {
-    console.error("EmailJS error:", error.message);
+    console.error("Nodemailer SMTP error:", error.message);
     return {
       statusCode: 500,
       body: JSON.stringify({ success: false, message: "Could not send your message. Please try again later." })

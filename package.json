@@ -6,6 +6,9 @@
     "build": "esbuild public/react/index.jsx --bundle --format=iife --global-name=ABCSolutionsCompanyReact --outfile=public/js/react-widgets.js",
     "netlify-build": "npm run build"
   },
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  },
   "devDependencies": {
     "esbuild": "^0.24.2",
     "react": "^19.0.0",

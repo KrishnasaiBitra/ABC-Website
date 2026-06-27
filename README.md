@@ -44,64 +44,28 @@ package.json            ← Node dependencies & esbuild compilation scripts
 
 ---
 
-## 📧 EmailJS Setup
+## 📧 SMTP Email Configuration
 
-EmailJS is used to handle form notifications and confirmations without maintaining a backend mail server or a database.
+The serverless backend uses **Nodemailer** to send notification and confirmation emails directly via SMTP (e.g. Gmail).
 
-### Step 1: Create an Account & Add Email Service
-1. Sign up on the [EmailJS Dashboard](https://dashboard.emailjs.com/).
-2. Navigate to **Email Services** and click **Add New Service**.
-3. Connect your preferred provider (e.g., Gmail, Outlook, or a custom SMTP server).
-4. Note your **Service ID** (e.g., `service_xxxxxx`).
+### Step 1: Configure SMTP Variables
+Rename or copy `.env.example` to `.env` in the project root:
+```bash
+cp .env.example .env
+```
 
-### Step 2: Configure the 4 Required Email Templates
-Create the following 4 email templates in the EmailJS dashboard. Be sure to match the variable placeholder names exactly.
+Open `.env` and fill in the values:
+*   `SMTP_HOST` — The address of your SMTP server (e.g. `smtp.gmail.com` for Gmail).
+*   `SMTP_PORT` — The SMTP port (defaults to `587`. If using SSL on port `465`, secure connection will be enabled automatically).
+*   `SMTP_USER` — The email address used to authenticate and send the mail (e.g. `example@gmail.com`).
+*   `SMTP_PASS` — The password or Google App Password (required for Gmail) corresponding to the email account.
+*   `COMPANY_EMAIL` — The target inbox where notifications and job applications will be forwarded (e.g. `info@whitestone.in`).
 
-#### 1. Contact Notification Template (`EMAILJS_TEMPLATE_ID_COMPANY`)
-Sent to the company admin (`info@whitestone.in`) when a user submits the landing page contact form.
-*   **Recipient Email:** `info@whitestone.in`
-*   **Placeholders used:**
-    *   `{{from_name}}` — Full name of the sender
-    *   `{{from_email}}` — Email address of the sender
-    *   `{{subject}}` — Subject line of the enquiry
-    *   `{{message}}` — Body of the message
-    *   `{{to_email}}` — Target company inbox
-
-#### 2. Contact Confirmation Template (`EMAILJS_TEMPLATE_ID_CONFIRM`)
-Automated confirmation email sent back to the client acknowledging their enquiry.
-*   **Recipient Email:** `{{to_email}}`
-*   **Placeholders used:**
-    *   `{{to_name}}` — Name of the recipient
-    *   `{{to_email}}` — Email address of the recipient
-    *   `{{subject}}` — Reference subject of the enquiry
-
-#### 3. Job Application Notification Template (`EMAILJS_TEMPLATE_ID_JOB_NOTIFY`)
-Sent to the HR team when a job application is received.
-*   **Recipient Email:** `info@whitestone.in`
-*   **Placeholders used:**
-    *   `{{applicant_name}}` — Full name of the applicant
-    *   `{{applicant_email}}` — Email address of the applicant
-    *   `{{applicant_phone}}` — Contact phone number
-    *   `{{applied_role}}` — Role applied for
-    *   `{{department}}` — Department of the role
-    *   `{{cover_letter}}` — Applicant's cover letter statement
-    *   `{{to_email}}` — Target HR email inbox
-
-#### 4. Job Application Confirmation Template (`EMAILJS_TEMPLATE_ID_JOB_CONFIRM`)
-Automated receipt email sent back to the job applicant.
-*   **Recipient Email:** `{{to_email}}`
-*   **Placeholders used:**
-    *   `{{to_name}}` — Name of the applicant
-    *   `{{to_email}}` — Email of the applicant
-    *   `{{applied_role}}` — Title of the role applied for
-
-### Step 3: Collect Integration Credentials
-Find your integration keys in the EmailJS dashboard:
-1. **Public Key:** Found under **Account** / **API Keys**.
-2. **Private Key:** Found under **Account** / **API Keys** (Access Token).
-3. **Template IDs:** Found under the settings of each template you created.
-
----
+### Step 2: Set up Google App Password (If using Gmail)
+1. Go to your [Google Account settings](https://myaccount.google.com/).
+2. Enable **2-Step Verification** under Security.
+3. Under Security -> **App passwords**, generate a new App Password (select 'Other' and name it, e.g. `ABC Website`).
+4. Copy the 16-character code generated and paste it as the `SMTP_PASS` value in your `.env` file.
 
 ## ⚙️ Local Development
 

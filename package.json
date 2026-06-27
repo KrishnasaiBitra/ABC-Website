@@ -2,26 +2,13 @@
   "name": "whitestone-website",
   "version": "1.0.0",
   "description": "Full-stack company website for ABC Solutions company Pvt. Ltd.",
-  "main": "api/index.js",
   "scripts": {
-    "dev": "node api/index.js",
-    "start": "node api/index.js",
-    "seed": "node scripts/seed.js",
     "build": "esbuild public/react/index.jsx --bundle --format=iife --global-name=ABCSolutionsCompanyReact --outfile=public/js/react-widgets.js",
-    "vercel-build": "npm run build",
-    "deploy": "vercel --prod"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "mongoose": "^8.9.2",
-    "multer": "^1.4.5-lts.1"
+    "netlify-build": "npm run build"
   },
   "devDependencies": {
     "esbuild": "^0.24.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "vercel": "^54.12.2"
+    "react-dom": "^19.0.0"
   }
 }

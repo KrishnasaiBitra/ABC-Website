@@ -394,3 +394,131 @@ p {
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── Scroll to top button ──────────────────────────────────────────────────── */
+#scrollToTopBtn {
+  display: none;
+  position: fixed;
+  bottom: 100px;
+  right: 28px;
+  z-index: 900;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-blue);
+  background: var(--white);
+  color: var(--accent-blue);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.2s, color 0.2s;
+}
+
+#scrollToTopBtn:hover {
+  background: var(--accent-blue);
+  color: var(--white);
+}
+
+/* ─── Floating contact button ───────────────────────────────────────────────── */
+#contactPopupBtn {
+  position: fixed;
+  bottom: 40px;
+  right: 28px;
+  z-index: 900;
+  padding: 0 24px;
+  height: 50px;
+  border-radius: 25px;
+  border: none;
+  background: var(--accent-blue);
+  color: var(--white);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+  transition: background 0.2s, transform 0.15s;
+}
+
+#contactPopupBtn:hover {
+  background: var(--primary-blue);
+  transform: scale(1.08);
+}
+
+/* ─── Contact popup overlay ─────────────────────────────────────────────────── */
+#contactPopupOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 14, 26, 0.6);
+  backdrop-filter: blur(3px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+#contactPopupOverlay.open {
+  display: flex;
+}
+
+.contact-popup-panel {
+  position: relative;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 40px 36px 36px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
+  animation: popupIn 0.22s ease;
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+#contactPopupClose {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  transition: color 0.15s;
+}
+
+#contactPopupClose:hover {
+  color: var(--text-dark);
+}
+
+.contact-popup-head {
+  margin-bottom: 24px;
+}
+
+.contact-popup-head h2 {
+  font-size: 1.5rem;
+  margin-top: 6px;
+}
+
+@media (max-width: 600px) {
+  .contact-popup-panel {
+    padding: 28px 20px 24px;
+  }
+  #scrollToTopBtn {
+    bottom: 106px;
+    right: 16px;
+  }
+  #contactPopupBtn {
+    bottom: 40px;
+    right: 16px;
+  }
+}
+

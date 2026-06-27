@@ -217,19 +217,6 @@
         </div>
       </div>
     </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="section-head"><p class="eyebrow">Contact</p><h2>Start a practical conversation about your banking technology needs.</h2></div>
-        <form class="card application-card application-form" data-contact-form>
-          <label class="form-field"><span>Full Name</span><input name="fullName" required><span class="field-error"></span></label>
-          <label class="form-field"><span>Email</span><input type="email" name="email" required><span class="field-error"></span></label>
-          <label class="form-field full"><span>Subject</span><input name="subject" required><span class="field-error"></span></label>
-          <label class="form-field full"><span>Message</span><textarea name="message" required></textarea><span class="field-error"></span></label>
-          <div class="full"><button class="btn btn-primary" type="submit">Send Message</button><p class="form-message"></p></div>
-        </form>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
@@ -243,6 +230,30 @@
       <div class="footer-bottom">© ABC Solutions company 2025. All rights reserved. | Terms of Use | Privacy | Environmental Policy</div>
     </div>
   </footer>
+
+  <!-- Scroll to top button -->
+  <button id="scrollToTopBtn" title="Back to top" aria-label="Scroll to top">↑</button>
+
+  <!-- Floating contact button -->
+  <button id="contactPopupBtn" title="Contact us" aria-label="Open contact form">Get in touch</button>
+
+  <!-- Contact popup overlay -->
+  <div id="contactPopupOverlay" role="dialog" aria-modal="true" aria-labelledby="contactPopupTitle">
+    <div class="contact-popup-panel">
+      <button id="contactPopupClose" aria-label="Close contact form">×</button>
+      <div class="contact-popup-head">
+        <p class="eyebrow">Get in touch</p>
+        <h2 id="contactPopupTitle">Talk to us about your banking technology needs.</h2>
+      </div>
+      <form class="application-form" data-contact-form>
+        <label class="form-field"><span>Full Name</span><input name="fullName" required><span class="field-error"></span></label>
+        <label class="form-field"><span>Email</span><input type="email" name="email" required><span class="field-error"></span></label>
+        <label class="form-field full"><span>Subject</span><input name="subject" required><span class="field-error"></span></label>
+        <label class="form-field full"><span>Message</span><textarea name="message" required rows="4"></textarea><span class="field-error"></span></label>
+        <div class="full"><button class="btn btn-primary" type="submit">Send Message</button><p class="form-message"></p></div>
+      </form>
+    </div>
+  </div>
 
   <script src="/js/form.js"></script>
   <script src="/js/nav.js"></script>

@@ -8,16 +8,31 @@ export function ContactForm() {
   async function submit(event) {
     event.preventDefault();
     setLoading(true);
+    setMessage(""); // Clear previous messages
+    
     const data = Object.fromEntries(new FormData(event.currentTarget).entries());
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-    const payload = await response.json();
-    setMessage(payload.message || "Please check the form and try again.");
-    setLoading(false);
-    if (response.ok) event.currentTarget.reset();
+    
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      // Handle non-200 responses
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
+      const payload = await response.json();
+      setMessage(payload.message || "Message sent successfully!");
+      event.currentTarget.reset();
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setMessage(`Error: ${error.message}. Please try again later.`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

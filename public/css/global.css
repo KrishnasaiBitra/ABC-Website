@@ -522,3 +522,450 @@ p {
   }
 }
 
+/* ─── Left & Right Floating Vertical Navbars ──────────────────────────────── */
+.side-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 18px 12px;
+  background: rgba(10, 14, 26, 0); /* Transparent by default */
+  backdrop-filter: blur(0px); /* No blur by default */
+  -webkit-backdrop-filter: blur(0px);
+  border: 1px solid rgba(255, 255, 255, 0); /* Transparent border by default */
+  border-radius: 40px;
+  box-shadow: none; /* No shadow by default */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.side-nav-left {
+  left: 20px;
+}
+
+
+/* Make side nav container expand slightly, blur, and show background/border/shadow on hover */
+.side-nav:hover {
+  background: rgba(10, 14, 26, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 
+              inset 0 1px 2px rgba(255, 255, 255, 0.15);
+}
+
+/* Nav Item Link */
+.side-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0; /* Invisible by default */
+  pointer-events: none; /* Ignore mouse events when invisible */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* SVG icons styling */
+.side-nav-item svg {
+  width: 20px;
+  height: 20px;
+  transform: scale(0.7) translateY(5px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke: currentColor;
+}
+
+/* When the nav bar is hovered, reveal icons and allow pointer events */
+.side-nav:hover .side-nav-item {
+  opacity: 0.55;
+  pointer-events: auto;
+}
+
+.side-nav:hover .side-nav-item svg {
+  transform: scale(1) translateY(0);
+}
+
+/* Hovering specific items inside the expanded nav bar */
+.side-nav-item:hover {
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.side-nav-item:hover svg {
+  opacity: 1 !important;
+  transform: scale(1.15) translateY(0) !important;
+  color: var(--accent-blue);
+  filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.5));
+}
+
+/* Active Highlight state ("which was open") - only highlights in hovered state */
+.side-nav-item.active {
+  color: var(--white);
+  background: rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(37, 99, 235, 0.4);
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
+}
+
+.side-nav:hover .side-nav-item.active {
+  opacity: 1;
+}
+
+.side-nav-item.active svg {
+  color: var(--accent-blue);
+  filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.7));
+}
+
+/* Active Indicator dot - only visible when the sidebar is hovered */
+.side-nav-item.active::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  box-shadow: 0 0 8px var(--accent-blue);
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.side-nav:hover .side-nav-item.active::after {
+  opacity: 1;
+}
+
+.side-nav-left .side-nav-item.active::after {
+  left: -8px;
+}
+
+
+/* Active vertical text name display (shown by default when collapsed) */
+.side-nav-active-name {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--accent-blue);
+  text-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.side-nav-left .side-nav-active-name {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+
+/* Hide the active name when the side nav is hovered */
+.side-nav:hover .side-nav-active-name {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Tooltips */
+.side-nav-tooltip {
+  position: absolute;
+  padding: 6px 12px;
+  background: var(--primary-dark);
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* Left side nav tooltip slides to the right */
+.side-nav-left .side-nav-tooltip {
+  left: 60px;
+  transform: translateX(-10px);
+}
+
+.side-nav-left .side-nav-item:hover .side-nav-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+
+/* Hide on mobile devices */
+@media (max-width: 767px) {
+  .side-nav,
+  .side-menu-trigger,
+  .side-menu-drawer,
+  .side-menu-overlay {
+    display: none !important;
+  }
+}
+
+/* ─── Floating Menu Trigger (Right Side) ────────────────────────────────── */
+.side-menu-trigger {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(10, 14, 26, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.side-menu-trigger svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  transition: transform 0.3s ease;
+}
+
+.side-menu-trigger:hover {
+  background: rgba(10, 14, 26, 0.7);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3), 
+              0 0 15px rgba(37, 99, 235, 0.2);
+}
+
+.side-menu-trigger:hover svg {
+  transform: rotate(90deg);
+}
+
+/* ─── Slide-out Drawer Panel (Right Side) ───────────────────────────────── */
+.side-menu-drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: min(420px, 100vw);
+  height: 100vh;
+  z-index: 10001; /* Above standard headers */
+  background: linear-gradient(135deg, rgba(10, 14, 26, 0.97), rgba(15, 23, 42, 0.99));
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -15px 0 50px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.side-menu-drawer.open {
+  transform: translateX(0);
+}
+
+/* Backdrop Overlay */
+.side-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(10, 14, 26, 0.55);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.side-menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Drawer Close Button */
+.side-menu-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.side-menu-close:hover {
+  color: var(--white);
+  transform: scale(1.05);
+}
+
+/* Drawer Content Container */
+.drawer-content {
+  padding: 80px 40px 40px;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom Scrollbar for Drawer Content */
+.drawer-content::-webkit-scrollbar {
+  width: 5px;
+}
+.drawer-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drawer-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.drawer-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Brand logo inside drawer */
+.drawer-brand {
+  display: grid;
+  gap: 0;
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--white);
+  margin-bottom: 40px;
+}
+
+.drawer-brand span {
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+}
+
+.drawer-brand small {
+  color: var(--accent-blue);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* Drawer section title */
+.drawer-section-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
+}
+
+/* Navigation List and Submenu styles */
+.drawer-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 auto 0; /* Push socials to bottom */
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.drawer-menu-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawer-menu-item .parent-link {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--white);
+  transition: all 0.3s ease;
+  display: inline-block;
+  letter-spacing: -0.01em;
+}
+
+.drawer-menu-item .parent-link:hover {
+  color: var(--accent-blue);
+  transform: translateX(4px);
+  text-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+}
+
+/* Submenu for Section Headings */
+.drawer-submenu {
+  list-style: none;
+  padding-left: 16px;
+  margin: 4px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.drawer-submenu a {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+  transition: all 0.25s ease;
+  display: inline-block;
+}
+
+.drawer-submenu a:hover {
+  color: var(--white);
+  transform: translateX(4px);
+}
+
+/* Social icons at bottom */
+.drawer-socials {
+  display: flex;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.drawer-socials a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.drawer-socials a:hover {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.3);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
+}
+
+
+

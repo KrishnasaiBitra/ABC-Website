@@ -13,23 +13,42 @@ function toBase64(file) {
 
 export function CareerForm({ jobs = [] }) {
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function submit(event) {
     event.preventDefault();
+    setLoading(true);
+    setMessage(""); // Clear previous messages
+    
     const form = event.currentTarget;
-    const formData = new FormData(form);
-    const resumeBase64 = await toBase64(formData.get("resume"));
-    const data = Object.fromEntries(formData.entries());
-    delete data.resume;
-    data.resumeBase64 = resumeBase64;
-    const response = await fetch("/api/careers/apply", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-    const payload = await response.json();
-    setMessage(payload.message || "Please check the form and try again.");
-    if (response.ok) form.reset();
+    
+    try {
+      const formData = new FormData(form);
+      const resumeBase64 = await toBase64(formData.get("resume"));
+      const data = Object.fromEntries(formData.entries());
+      delete data.resume;
+      data.resumeBase64 = resumeBase64;
+      
+      const response = await fetch("/api/careers/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      // Handle non-200 responses
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
+      const payload = await response.json();
+      setMessage(payload.message || "Application submitted successfully!");
+      form.reset();
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setMessage(`Error: ${error.message}. Please try again later.`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -41,7 +60,7 @@ export function CareerForm({ jobs = [] }) {
       <label className="form-field"><span>Department</span><select name="department" required><option>Engineering</option><option>Banking</option><option>HR</option><option>Operations</option></select></label>
       <label className="form-field"><span>Resume</span><input type="file" name="resume" /></label>
       <label className="form-field full"><span>Cover Letter</span><textarea name="coverLetter" /></label>
-      <div className="full"><button className="btn btn-primary" type="submit">Submit Application</button><p>{message}</p></div>
+      <div className="full"><button className="btn btn-primary" type="submit" disabled={loading}>{loading ? "Submitting" : "Submit Application"}</button><p>{message}</p></div>
     </form>
   );
 }

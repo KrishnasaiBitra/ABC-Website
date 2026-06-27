@@ -18,6 +18,7 @@
   justify-content: space-between;
   gap: 24px;
   padding: 28px;
+  margin-bottom: 32px;
 }
 
 .counter-band strong {

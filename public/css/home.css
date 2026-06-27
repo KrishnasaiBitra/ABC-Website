@@ -219,3 +219,10 @@
     grid-template-columns: 1fr;
   }
 }
+
+.logo-pill svg,
+.client-pill svg,
+.tool-pill svg {
+  margin-right: 8px;
+  flex-shrink: 0;
+}

@@ -1,4 +1,18 @@
 (function () {
+  // Redirect API requests to live Netlify backend when hosted on GoDaddy (or other production hosts)
+  const originalFetch = window.fetch;
+  window.fetch = function (input, init) {
+    if (typeof input === "string" && input.startsWith("/api/")) {
+      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      if (!isLocal) {
+        // REPLACE this URL with your actual deployed Netlify site address
+        const NETLIFY_BACKEND_URL = "https://abc-solutions-company.netlify.app";
+        input = NETLIFY_BACKEND_URL + input;
+      }
+    }
+    return originalFetch(input, init);
+  };
+
   const header = document.querySelector(".site-header");
   const toggle = document.querySelector(".hamburger");
   const navLinks = document.querySelector(".nav-links");

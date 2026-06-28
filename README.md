@@ -23,6 +23,7 @@ Full-stack company website for ABC Solutions Company Pvt. Ltd., a banking techno
 
 ---
 
+
 ## Project Structure
 
 ```text
@@ -53,6 +54,7 @@ Rename or copy `.env.example` to `.env` in the project root:
 ```bash
 cp .env.example .env
 ```
+
 
 Open `.env` and fill in the values:
 *   `SMTP_HOST` — The address of your SMTP server (e.g. `smtp.gmail.com` for Gmail).
@@ -94,6 +96,7 @@ To run the application locally and test Netlify serverless functions:
     This runs the frontend assets and starts local functions on `http://localhost:8888`.
 
 ---
+
 
 ## 🚀 Netlify Deployment
 

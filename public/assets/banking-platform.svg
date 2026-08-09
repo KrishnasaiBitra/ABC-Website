@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-label="Banking platform interface">
+  <rect width="1400" height="900" fill="#0a0e1a"/>
+  <path d="M0 720 C260 650 400 820 650 730 C860 655 980 520 1400 590 L1400 900 L0 900 Z" fill="#1a3a6e"/>
+  <rect x="150" y="150" width="560" height="360" rx="22" fill="#ffffff" opacity=".12"/>
+  <rect x="185" y="195" width="250" height="26" rx="13" fill="#ffffff" opacity=".56"/>
+  <rect x="185" y="255" width="430" height="16" rx="8" fill="#ffffff" opacity=".22"/>
+  <rect x="185" y="294" width="370" height="16" rx="8" fill="#ffffff" opacity=".22"/>
+  <rect x="185" y="355" width="140" height="76" rx="14" fill="#2563eb" opacity=".78"/>
+  <rect x="350" y="355" width="140" height="76" rx="14" fill="#ffffff" opacity=".18"/>
+  <rect x="515" y="355" width="140" height="76" rx="14" fill="#ffffff" opacity=".18"/>
+  <circle cx="1010" cy="330" r="180" fill="#2563eb" opacity=".2"/>
+  <circle cx="1010" cy="330" r="110" fill="#ffffff" opacity=".13"/>
+  <path d="M920 330 L990 390 L1115 245" fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+</svg>

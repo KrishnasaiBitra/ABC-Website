@@ -1,0 +1,16 @@
+# Environment variables — never commit these
+.env
+.env.local
+
+# Node modules
+node_modules/
+
+# Build output (optional — you can commit this if you want Netlify to skip the build step)
+# public/js/react-widgets.js
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Local Netlify folder
+.netlify

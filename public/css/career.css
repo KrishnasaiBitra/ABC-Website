@@ -1,0 +1,82 @@
+.career-intro {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 34px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.filter-btn {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-dark);
+  font-weight: 700;
+  background: var(--white);
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  color: var(--white);
+  border-color: var(--accent-blue);
+  background: var(--accent-blue);
+}
+
+.job-card,
+.application-card,
+.why-card {
+  padding: 24px;
+}
+
+.job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.job-meta span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--primary-blue);
+  font-size: 0.84rem;
+  font-weight: 800;
+  background: var(--off-white);
+}
+
+.skeleton {
+  min-height: 190px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eef2f7, #f8fafc, #eef2f7);
+  background-size: 220% 100%;
+  animation: shimmer 1.2s infinite linear;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -220% 0;
+  }
+}
+
+.application-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.application-form .full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 767px) {
+  .career-intro,
+  .application-form {
+    grid-template-columns: 1fr;
+  }
+}

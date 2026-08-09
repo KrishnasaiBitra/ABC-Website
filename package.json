@@ -1,0 +1,22 @@
+{
+  "name": "afnamtech-website",
+  "version": "1.0.0",
+  "description": "Afnamtech Private Limited company website with static pages and Netlify Functions email APIs.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "netlify-build": "npm run build",
+    "start": "node server.js",
+    "dev": "node server.js",
+    "lint": "node --check server.js && node --check netlify/functions/contact.js && node --check netlify/functions/careers.js && node --check netlify/functions/careers-apply.js && node --check lib/validation.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "nodemailer": "^6.9.13"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

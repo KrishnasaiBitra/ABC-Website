@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" role="img" aria-label="Core banking solution">
+  <rect width="900" height="560" fill="#f4f6fb"/>
+  <rect x="90" y="100" width="720" height="360" rx="24" fill="#0a0e1a"/>
+  <rect x="130" y="145" width="250" height="28" rx="14" fill="#ffffff" opacity=".74"/>
+  <rect x="130" y="220" width="590" height="38" rx="10" fill="#2563eb"/>
+  <rect x="130" y="285" width="260" height="90" rx="16" fill="#ffffff" opacity=".14"/>
+  <rect x="420" y="285" width="300" height="90" rx="16" fill="#ffffff" opacity=".14"/>
+</svg>

@@ -1,0 +1,34 @@
+[build]
+  command = "npm run netlify-build"
+  publish = "public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/our-story"
+  to = "/our-story.html"
+  status = 200
+
+[[redirects]]
+  from = "/solutions"
+  to = "/solutions.html"
+  status = 200
+
+[[redirects]]
+  from = "/what-we-offer"
+  to = "/what-we-offer.html"
+  status = 200
+
+[[redirects]]
+  from = "/career"
+  to = "/career.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

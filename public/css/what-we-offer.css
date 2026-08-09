@@ -1,0 +1,79 @@
+.offer-card {
+  overflow: hidden;
+}
+
+.offer-card img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.offer-card div {
+  padding: 24px;
+}
+
+.counter-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+  margin-bottom: 32px;
+}
+
+.counter-band strong {
+  color: var(--accent-blue);
+  font-size: 2.2rem;
+}
+
+.tool-pulse {
+  animation: pulse 520ms ease;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.34);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgba(37, 99, 235, 0);
+  }
+}
+
+.flip-card {
+  min-height: 230px;
+  perspective: 1000px;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  min-height: 230px;
+  transition: transform 500ms ease;
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-inner,
+.flip-card.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 26px;
+  backface-visibility: hidden;
+}
+
+.flip-back {
+  color: var(--white);
+  background: var(--primary-blue);
+  transform: rotateY(180deg);
+}
+
+.flip-back h3,
+.flip-back p {
+  color: var(--white);
+}

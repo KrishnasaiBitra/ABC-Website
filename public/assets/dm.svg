@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" role="img" aria-label="Data migration workflow">
+  <rect width="900" height="560" fill="#f4f6fb"/>
+  <rect x="90" y="165" width="220" height="230" rx="22" fill="#1a3a6e"/>
+  <rect x="590" y="165" width="220" height="230" rx="22" fill="#2563eb"/>
+  <path d="M340 280 H548" stroke="#0a0e1a" stroke-width="20" stroke-linecap="round"/>
+  <path d="M525 235 L575 280 L525 325" fill="none" stroke="#0a0e1a" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="130" y="210" width="110" height="18" rx="9" fill="#fff" opacity=".8"/>
+  <rect x="630" y="210" width="110" height="18" rx="9" fill="#fff" opacity=".8"/>
+</svg>

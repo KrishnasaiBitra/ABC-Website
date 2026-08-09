@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-label="AI assisted operations">
+  <rect width="1200" height="760" fill="#0a0e1a"/>
+  <g fill="none" stroke="#2563eb" stroke-width="4" opacity=".45">
+    <path d="M220 380 H460"/>
+    <path d="M740 380 H980"/>
+    <path d="M600 205 V115"/>
+    <path d="M600 555 V655"/>
+  </g>
+  <circle cx="600" cy="380" r="150" fill="#1a3a6e"/>
+  <circle cx="600" cy="380" r="88" fill="#2563eb" opacity=".85"/>
+  <circle cx="220" cy="380" r="54" fill="#ffffff" opacity=".12"/>
+  <circle cx="980" cy="380" r="54" fill="#ffffff" opacity=".12"/>
+  <circle cx="600" cy="115" r="54" fill="#ffffff" opacity=".12"/>
+  <circle cx="600" cy="655" r="54" fill="#ffffff" opacity=".12"/>
+  <path d="M565 385 C575 350 625 350 635 385 C645 420 555 420 565 385 Z" fill="#ffffff" opacity=".8"/>
+</svg>

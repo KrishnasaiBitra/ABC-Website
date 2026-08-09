@@ -1,0 +1,51 @@
+.overview {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 42px;
+  align-items: center;
+}
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+.stat-box {
+  padding: 26px;
+  text-align: center;
+}
+
+.stat-box strong {
+  display: block;
+  color: var(--accent-blue);
+  font-size: 2.2rem;
+}
+
+.timeline {
+  display: grid;
+  gap: 24px;
+}
+
+.milestone {
+  width: min(620px, 100%);
+  padding: 24px;
+}
+
+.milestone:nth-child(even) {
+  justify-self: end;
+}
+
+.slide-left {
+  transform: translateX(-28px);
+}
+
+.slide-right {
+  transform: translateX(28px);
+}
+
+@media (max-width: 767px) {
+  .overview {
+    grid-template-columns: 1fr;
+  }
+}

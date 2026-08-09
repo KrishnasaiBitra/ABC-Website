@@ -1,0 +1,30 @@
+.solution-card {
+  padding: 24px;
+}
+
+.solution-number {
+  color: var(--accent-blue);
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 800;
+}
+
+.solution-card p {
+  margin: 12px 0 16px;
+  color: var(--text-muted);
+}
+
+.solution-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 260ms ease;
+}
+
+.solution-card.open .solution-details {
+  max-height: 420px;
+}
+
+.solution-details ul {
+  padding-left: 18px;
+  margin-bottom: 0;
+  color: var(--text-muted);
+}

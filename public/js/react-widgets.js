@@ -21458,16 +21458,26 @@ var ABCSolutionsCompanyReact = (() => {
     async function submit(event) {
       event.preventDefault();
       setLoading(true);
+      setMessage("");
       const data = Object.fromEntries(new FormData(event.currentTarget).entries());
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      const payload = await response.json();
-      setMessage(payload.message || "Please check the form and try again.");
-      setLoading(false);
-      if (response.ok) event.currentTarget.reset();
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+        const payload = await response.json();
+        setMessage(payload.message || "Message sent successfully!");
+        event.currentTarget.reset();
+      } catch (error) {
+        console.error("Form submission error:", error);
+        setMessage(`Error: ${error.message}. Please try again later.`);
+      } finally {
+        setLoading(false);
+      }
     }
     return /* @__PURE__ */ import_react.default.createElement("form", { className: "application-form", onSubmit: submit }, /* @__PURE__ */ import_react.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react.default.createElement("span", null, "Full Name"), /* @__PURE__ */ import_react.default.createElement("input", { name: "fullName", required: true })), /* @__PURE__ */ import_react.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react.default.createElement("span", null, "Email"), /* @__PURE__ */ import_react.default.createElement("input", { type: "email", name: "email", required: true })), /* @__PURE__ */ import_react.default.createElement("label", { className: "form-field full" }, /* @__PURE__ */ import_react.default.createElement("span", null, "Subject"), /* @__PURE__ */ import_react.default.createElement("input", { name: "subject", required: true })), /* @__PURE__ */ import_react.default.createElement("label", { className: "form-field full" }, /* @__PURE__ */ import_react.default.createElement("span", null, "Message"), /* @__PURE__ */ import_react.default.createElement("textarea", { name: "message", required: true, minLength: "10" })), /* @__PURE__ */ import_react.default.createElement("div", { className: "full" }, /* @__PURE__ */ import_react.default.createElement("button", { className: "btn btn-primary", type: "submit", disabled: loading }, loading ? "Sending" : "Send Message"), /* @__PURE__ */ import_react.default.createElement("p", null, message)));
   }
@@ -21488,24 +21498,37 @@ var ABCSolutionsCompanyReact = (() => {
   }
   function CareerForm({ jobs = [] }) {
     const [message, setMessage] = (0, import_react2.useState)("");
+    const [loading, setLoading] = (0, import_react2.useState)(false);
     async function submit(event) {
       event.preventDefault();
+      setLoading(true);
+      setMessage("");
       const form = event.currentTarget;
-      const formData = new FormData(form);
-      const resumeBase64 = await toBase64(formData.get("resume"));
-      const data = Object.fromEntries(formData.entries());
-      delete data.resume;
-      data.resumeBase64 = resumeBase64;
-      const response = await fetch("/api/careers/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-      const payload = await response.json();
-      setMessage(payload.message || "Please check the form and try again.");
-      if (response.ok) form.reset();
+      try {
+        const formData = new FormData(form);
+        const resumeBase64 = await toBase64(formData.get("resume"));
+        const data = Object.fromEntries(formData.entries());
+        delete data.resume;
+        data.resumeBase64 = resumeBase64;
+        const response = await fetch("/api/careers/apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+        const payload = await response.json();
+        setMessage(payload.message || "Application submitted successfully!");
+        form.reset();
+      } catch (error) {
+        console.error("Form submission error:", error);
+        setMessage(`Error: ${error.message}. Please try again later.`);
+      } finally {
+        setLoading(false);
+      }
     }
-    return /* @__PURE__ */ import_react2.default.createElement("form", { className: "application-form", onSubmit: submit }, /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Full Name"), /* @__PURE__ */ import_react2.default.createElement("input", { name: "fullName", required: true })), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Email"), /* @__PURE__ */ import_react2.default.createElement("input", { type: "email", name: "email", required: true })), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Phone"), /* @__PURE__ */ import_react2.default.createElement("input", { name: "phone", required: true })), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Role"), /* @__PURE__ */ import_react2.default.createElement("select", { name: "role", required: true }, jobs.map((job) => /* @__PURE__ */ import_react2.default.createElement("option", { key: job.role }, job.role)))), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Department"), /* @__PURE__ */ import_react2.default.createElement("select", { name: "department", required: true }, /* @__PURE__ */ import_react2.default.createElement("option", null, "Engineering"), /* @__PURE__ */ import_react2.default.createElement("option", null, "Banking"), /* @__PURE__ */ import_react2.default.createElement("option", null, "HR"), /* @__PURE__ */ import_react2.default.createElement("option", null, "Operations"))), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Resume"), /* @__PURE__ */ import_react2.default.createElement("input", { type: "file", name: "resume" })), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field full" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Cover Letter"), /* @__PURE__ */ import_react2.default.createElement("textarea", { name: "coverLetter" })), /* @__PURE__ */ import_react2.default.createElement("div", { className: "full" }, /* @__PURE__ */ import_react2.default.createElement("button", { className: "btn btn-primary", type: "submit" }, "Submit Application"), /* @__PURE__ */ import_react2.default.createElement("p", null, message)));
+    return /* @__PURE__ */ import_react2.default.createElement("form", { className: "application-form", onSubmit: submit }, /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Full Name"), /* @__PURE__ */ import_react2.default.createElement("input", { name: "fullName", required: true })), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Email"), /* @__PURE__ */ import_react2.default.createElement("input", { type: "email", name: "email", required: true })), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Phone"), /* @__PURE__ */ import_react2.default.createElement("input", { name: "phone", required: true })), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Role"), /* @__PURE__ */ import_react2.default.createElement("select", { name: "role", required: true }, jobs.map((job) => /* @__PURE__ */ import_react2.default.createElement("option", { key: job.role }, job.role)))), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Department"), /* @__PURE__ */ import_react2.default.createElement("select", { name: "department", required: true }, /* @__PURE__ */ import_react2.default.createElement("option", null, "Engineering"), /* @__PURE__ */ import_react2.default.createElement("option", null, "Banking"), /* @__PURE__ */ import_react2.default.createElement("option", null, "HR"), /* @__PURE__ */ import_react2.default.createElement("option", null, "Operations"))), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Resume"), /* @__PURE__ */ import_react2.default.createElement("input", { type: "file", name: "resume" })), /* @__PURE__ */ import_react2.default.createElement("label", { className: "form-field full" }, /* @__PURE__ */ import_react2.default.createElement("span", null, "Cover Letter"), /* @__PURE__ */ import_react2.default.createElement("textarea", { name: "coverLetter" })), /* @__PURE__ */ import_react2.default.createElement("div", { className: "full" }, /* @__PURE__ */ import_react2.default.createElement("button", { className: "btn btn-primary", type: "submit", disabled: loading }, loading ? "Submitting" : "Submit Application"), /* @__PURE__ */ import_react2.default.createElement("p", null, message)));
   }
   var mount2 = document.querySelector("[data-react-career-form]");
   if (mount2) (0, import_client2.createRoot)(mount2).render(/* @__PURE__ */ import_react2.default.createElement(CareerForm, { jobs: window.ABCSolutionsCompanyJobs || [] }));

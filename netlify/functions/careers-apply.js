@@ -1,137 +1,153 @@
 // netlify/functions/careers-apply.js
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
-const nodemailer = require("nodemailer");
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const nodemailer = require('nodemailer');
+const {
+  jsonResponse,
+  normalizeString,
+  isEmailValid,
+  escapeHtml,
+  MAX_LENGTHS,
+  getClientIp,
+  createRateLimiter,
+  getCorsHeaders,
+  parseBase64Upload
+} = require('../../lib/validation');
+
+const rateLimiter = createRateLimiter();
 
 exports.handler = async function (event) {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ success: false, message: "Method not allowed." }) };
+  const origin = event.headers && (event.headers.origin || event.headers.Origin) ? (event.headers.origin || event.headers.Origin) : null;
+
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers: getCorsHeaders(origin),
+      body: ''
+    };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return jsonResponse(405, { success: false, message: 'Method not allowed.' }, origin);
   }
 
   let body;
   try {
-    body = JSON.parse(event.body);
+    body = JSON.parse(event.body || '{}');
   } catch {
-    return { statusCode: 400, body: JSON.stringify({ success: false, message: "Invalid request body." }) };
+    return jsonResponse(400, { success: false, message: 'Invalid request body.' }, origin);
   }
 
-  const { fullName, email, phone, role, department, coverLetter } = body;
-  const errors = [];
-
-  if (!fullName || !fullName.trim()) errors.push("Full name is required.");
-  if (!email || !emailRegex.test(email)) errors.push("Enter a valid email address.");
-  if (!phone || !phone.trim()) errors.push("Phone number is required.");
-  if (!role || !role.trim()) errors.push("Please select the role you are applying for.");
-
-  if (errors.length) {
-    return { statusCode: 400, body: JSON.stringify({ success: false, message: errors[0] }) };
+  if (body && typeof body === 'object' && body.website && String(body.website).trim()) {
+    return jsonResponse(400, { success: false, message: 'Submission rejected.' }, origin);
   }
 
-  const SMTP_HOST = process.env.SMTP_HOST || "smtp.gmail.com";
-  const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587", 10);
+  const clientIp = getClientIp(event.headers || {});
+  const limit = rateLimiter(clientIp);
+  if (!limit.allowed) {
+    return jsonResponse(429, { success: false, message: 'Too many submission attempts. Please try again later.' }, origin);
+  }
+
+  const fullName = normalizeString(body.fullName, { maxLength: MAX_LENGTHS.name });
+  const email = normalizeString(body.email, { maxLength: MAX_LENGTHS.email });
+  const phone = normalizeString(body.phone, { maxLength: MAX_LENGTHS.phone });
+  const role = normalizeString(body.role, { maxLength: MAX_LENGTHS.role });
+  const department = normalizeString(body.department, { maxLength: MAX_LENGTHS.department, allowEmpty: true });
+  const coverLetter = normalizeString(body.coverLetter, { maxLength: MAX_LENGTHS.coverLetter, allowEmpty: true });
+
+  if (!fullName) {
+    return jsonResponse(400, { success: false, message: 'Full name is required.' }, origin);
+  }
+  if (!email || !isEmailValid(email)) {
+    return jsonResponse(400, { success: false, message: 'Enter a valid email address.' }, origin);
+  }
+  if (!phone) {
+    return jsonResponse(400, { success: false, message: 'Phone number is required.' }, origin);
+  }
+  if (!role) {
+    return jsonResponse(400, { success: false, message: 'Please select the role you are applying for.' }, origin);
+  }
+
+  const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
   const SMTP_USER = process.env.SMTP_USER;
   const SMTP_PASS = process.env.SMTP_PASS;
-  const COMPANY_EMAIL = process.env.COMPANY_EMAIL || "info@whitestone.in";
+  const COMPANY_EMAIL = process.env.COMPANY_EMAIL;
 
-  if (!SMTP_USER || !SMTP_PASS) {
-    console.error("Missing SMTP credentials.");
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ success: false, message: "Email service is not configured. Please set SMTP credentials." })
-    };
+  if (!SMTP_USER || !SMTP_PASS || !COMPANY_EMAIL) {
+    console.error('Career form missing SMTP config', { hasUser: !!SMTP_USER, hasPass: !!SMTP_PASS, hasCompanyEmail: !!COMPANY_EMAIL });
+    return jsonResponse(500, { success: false, message: 'Email service is not configured. Please try again later.' }, origin);
   }
 
   const transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: SMTP_PORT,
-    secure: SMTP_PORT === 465, // true for 465, false for 587
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS
-    }
+    secure: SMTP_PORT === 465,
+    auth: { user: SMTP_USER, pass: SMTP_PASS }
   });
 
   const attachments = [];
-  if (body.resumeBase64) {
-    const matches = body.resumeBase64.match(/^data:(.+);base64,(.+)$/);
-    if (matches) {
-      const contentType = matches[1];
-      const base64Data = matches[2];
-      
-      let extension = "bin";
-      if (contentType.includes("pdf")) extension = "pdf";
-      else if (contentType.includes("msword")) extension = "doc";
-      else if (contentType.includes("officedocument.wordprocessingml")) extension = "docx";
-      else if (contentType.includes("jpeg")) extension = "jpg";
-      else if (contentType.includes("png")) extension = "png";
-
-      attachments.push({
-        filename: `Resume_${fullName.trim().replace(/\s+/g, "_")}.${extension}`,
-        content: Buffer.from(base64Data, "base64"),
-        contentType: contentType
-      });
+  if (typeof body.resumeBase64 === 'string' && body.resumeBase64.trim()) {
+    const parsedResume = parseBase64Upload(body.resumeBase64, { maxBytes: 5 * 1024 * 1024 });
+    if (!parsedResume.ok) {
+      return jsonResponse(400, { success: false, message: parsedResume.error }, origin);
     }
+
+    attachments.push({
+      filename: `Resume_${fullName.replace(/\s+/g, '_')}.${parsedResume.extension}`,
+      content: parsedResume.buffer,
+      contentType: parsedResume.mime
+    });
   }
 
+  const safeFullName = escapeHtml(fullName);
+  const safeEmail = escapeHtml(email);
+  const safePhone = escapeHtml(phone);
+  const safeRole = escapeHtml(role);
+  const safeDepartment = escapeHtml(department || 'Not specified');
+  const safeCoverLetter = escapeHtml(coverLetter || 'Not provided');
+
   try {
-    // Email 1: HR team notification
-    await transporter.sendMail({
-      from: `"${fullName.trim()}" <${SMTP_USER}>`,
+    const companyMail = await transporter.sendMail({
+      from: `"Afnamtech Private Limited" <${SMTP_USER}>`,
       to: COMPANY_EMAIL,
-      replyTo: email.trim(),
-      subject: `New Job Application: ${role.trim()} - ${fullName.trim()}`,
-      text: `You have received a new job application.\n\n` +
-            `Applicant Name: ${fullName.trim()}\n` +
-            `Email: ${email.trim()}\n` +
-            `Phone: ${phone.trim()}\n` +
-            `Applied Role: ${role.trim()}\n` +
-            `Department: ${department ? department.trim() : "Not specified"}\n\n` +
-            `Cover Letter:\n${coverLetter ? coverLetter.trim() : "Not provided"}\n\n` +
-            (attachments.length ? `Note: The applicant's resume is attached to this email.` : `Note: No resume was attached.`),
-      html: `<p>You have received a new job application.</p>` +
-            `<p><strong>Applicant Name:</strong> ${fullName.trim()}<br>` +
-            `<strong>Email:</strong> ${email.trim()}<br>` +
-            `<strong>Phone:</strong> ${phone.trim()}<br>` +
-            `<strong>Applied Role:</strong> ${role.trim()}<br>` +
-            `<strong>Department:</strong> ${department ? department.trim() : "Not specified"}</p>` +
-            `<p><strong>Cover Letter:</strong><br>${coverLetter ? coverLetter.trim().replace(/\n/g, "<br>") : "Not provided"}</p>` +
-            (attachments.length ? `<p><em>Note: The applicant's resume is attached to this email.</em></p>` : `<p><em>Note: No resume was attached.</em></p>`),
-      attachments: attachments
+      replyTo: email,
+      subject: `New Job Application: ${role} - ${fullName}`,
+      text: `You have received a new job application.\n\nApplicant Name: ${fullName}\nEmail: ${email}\nPhone: ${phone}\nApplied Role: ${role}\nDepartment: ${department || 'Not specified'}\n\nCover Letter:\n${coverLetter || 'Not provided'}\n\n${attachments.length ? 'Note: The applicant\'s resume is attached to this email.' : 'Note: No resume was attached.'}`,
+      html: `<p>You have received a new job application.</p><p><strong>Applicant Name:</strong> ${safeFullName}<br><strong>Email:</strong> ${safeEmail}<br><strong>Phone:</strong> ${safePhone}<br><strong>Applied Role:</strong> ${safeRole}<br><strong>Department:</strong> ${safeDepartment}</p><p><strong>Cover Letter:</strong><br>${safeCoverLetter.replace(/\n/g, '<br>')}</p>${attachments.length ? '<p><em>Note: The applicant\'s resume is attached to this email.</em></p>' : '<p><em>Note: No resume was attached.</em></p>'}`,
+      attachments
+    });
+    console.log('Career company mail accepted by SMTP', {
+      to: COMPANY_EMAIL,
+      messageId: companyMail && companyMail.messageId,
+      response: companyMail && companyMail.response
     });
 
-    // Email 2: Confirmation to applicant
-    await transporter.sendMail({
-      from: `"ABC Solutions Careers" <${SMTP_USER}>`,
-      to: email.trim(),
-      subject: `Application Received: ${role.trim()}`,
-      text: `Dear ${fullName.trim()},\n\n` +
-            `Thank you for applying for the position of "${role.trim()}" at ABC Solutions Company Pvt. Ltd.\n\n` +
-            `We have successfully received your application. Our recruitment team is currently reviewing submissions, and if your background matches our requirements, we will reach out to you within 5 business days for next steps.\n\n` +
-            `Best regards,\n` +
-            `HR & Recruitment Team\n` +
-            `ABC Solutions Company Pvt. Ltd.\n` +
-            `Dharmapuri, Tamil Nadu, India`,
-      html: `<p>Dear ${fullName.trim()},</p>` +
-            `<p>Thank you for applying for the position of "<strong>${role.trim()}</strong>" at ABC Solutions Company Pvt. Ltd.</p>` +
-            `<p>We have successfully received your application. Our recruitment team is currently reviewing submissions, and if your background matches our requirements, we will reach out to you within 5 business days for next steps.</p>` +
-            `<p>Best regards,<br>` +
-            `<strong>HR & Recruitment Team</strong><br>` +
-            `ABC Solutions Company Pvt. Ltd.<br>` +
-            `Dharmapuri, Tamil Nadu, India</p>`
+    const confirmationMail = await transporter.sendMail({
+      from: `"Afnamtech Private Limited" <${SMTP_USER}>`,
+      to: email,
+      replyTo: COMPANY_EMAIL,
+      subject: `Application Received: ${role}`,
+      text: `Dear ${fullName},\n\nThank you for applying for the position of "${role}" at Afnamtech Private Limited.\n\nWe have successfully received your application. Our recruitment team is currently reviewing submissions, and if your background matches our requirements, we will reach out to you within 5 business days for next steps.\n\nBest regards,\nHR & Recruitment Team\nAfnamtech Private Limited\nProsperous Enclave layout, 1" cross, Plot #47, 3rd Floor, Vitta sandra, Electronics City, Behind Vibgyor School, Bangalore - 560100.`,
+      html: `<p>Dear ${safeFullName},</p><p>Thank you for applying for the position of "<strong>${safeRole}</strong>" at Afnamtech Private Limited.</p><p>We have successfully received your application. Our recruitment team is currently reviewing submissions, and if your background matches our requirements, we will reach out to you within 5 business days for next steps.</p><p>Best regards,<br><strong>HR & Recruitment Team</strong><br>Afnamtech Private Limited<br>Prosperous Enclave layout, 1" cross, Plot #47, 3rd Floor, Vitta sandra, Electronics City, Behind Vibgyor School, Bangalore - 560100.</p>`
+    });
+    console.log('Career confirmation mail accepted by SMTP', {
+      to: email,
+      messageId: confirmationMail && confirmationMail.messageId,
+      response: confirmationMail && confirmationMail.response
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        success: true,
-        message: "Application received. Our HR team will reach out within 5 business days."
-      })
-    };
+    return jsonResponse(200, {
+      success: true,
+      message: 'Application received. Our HR team will reach out within 5 business days.'
+    }, origin);
   } catch (error) {
-    console.error("Nodemailer SMTP error:", error.message);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ success: false, message: "Could not submit your application. Please try again later." })
-    };
+    console.error('Career application SMTP send failed', {
+      code: error && error.code,
+      message: error && error.message,
+      response: error && error.response ? String(error.response).slice(0, 200) : null
+    });
+    return jsonResponse(500, { success: false, message: 'Could not submit your application. Please try again later.' }, origin);
   }
 };

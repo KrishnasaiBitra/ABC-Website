@@ -43,49 +43,101 @@
     }
   ];
 
+  function textNode(value) {
+    const node = document.createTextNode(String(value ?? ''));
+    return node;
+  }
+
+  function createJobCard(job) {
+    const article = document.createElement('article');
+    article.className = 'card job-card';
+
+    const title = document.createElement('h3');
+    title.textContent = job.role;
+
+    const meta = document.createElement('div');
+    meta.className = 'job-meta';
+    [job.department, job.type, job.location].forEach((item) => {
+      const badge = document.createElement('span');
+      badge.textContent = item;
+      meta.appendChild(badge);
+    });
+
+    const description = document.createElement('p');
+    description.textContent = job.description;
+
+    const list = document.createElement('ul');
+    list.className = 'simple-list';
+    (job.requirements || []).forEach((item) => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      list.appendChild(li);
+    });
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn btn-primary';
+    button.textContent = 'Apply Now';
+    button.dataset.apply = job.role;
+    button.addEventListener('click', () => {
+      if (roleSelect) roleSelect.value = job.role;
+      const form = document.querySelector('#application-form');
+      if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    article.append(title, meta, description, list, button);
+    return article;
+  }
+
   function skeleton() {
     if (!board) return;
-    board.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+    board.innerHTML = '';
+    ['skeleton', 'skeleton', 'skeleton'].forEach(() => {
+      const div = document.createElement('div');
+      div.className = 'skeleton';
+      board.appendChild(div);
+    });
   }
 
   function render() {
     if (!board) return;
-    const visible = activeFilter === "All"
+    board.innerHTML = '';
+
+    const visible = activeFilter === 'All'
       ? jobs
-      : jobs.filter((job) => [job.department, job.type, job.location, job.isRemote ? "Remote" : "On-site"].some((value) => String(value).includes(activeFilter)));
+      : jobs.filter((job) => [job.department, job.type, job.location, job.isRemote ? 'Remote' : 'On-site'].some((value) => String(value).includes(activeFilter)));
 
     if (!visible.length) {
-      board.innerHTML = '<p class="lead">No open roles match this filter right now.</p>';
+      const empty = document.createElement('p');
+      empty.className = 'lead';
+      empty.textContent = 'No open roles match this filter right now.';
+      board.appendChild(empty);
       return;
     }
 
-    board.innerHTML = visible.map((job) => `
-      <article class="card job-card">
-        <h3>${job.role}</h3>
-        <div class="job-meta"><span>${job.department}</span><span>${job.type}</span><span>${job.location}</span></div>
-        <p>${job.description}</p>
-        <ul class="simple-list">${(job.requirements || []).map((item) => `<li>${item}</li>`).join("")}</ul>
-        <button class="btn btn-primary" type="button" data-apply="${job.role}">Apply Now</button>
-      </article>
-    `).join("");
-
-    board.querySelectorAll("[data-apply]").forEach((button) => {
-      button.addEventListener("click", () => {
-        if (roleSelect) roleSelect.value = button.dataset.apply;
-        document.querySelector("#application-form").scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    });
+    visible.forEach((job) => board.appendChild(createJobCard(job)));
   }
 
   function populateRoles() {
     if (!roleSelect) return;
-    roleSelect.innerHTML = '<option value="">Select a role</option>' + jobs.map((job) => `<option value="${job.role}">${job.role}</option>`).join("");
+    roleSelect.innerHTML = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select a role';
+    roleSelect.appendChild(defaultOption);
+
+    jobs.forEach((job) => {
+      const option = document.createElement('option');
+      option.value = job.role;
+      option.textContent = job.role;
+      roleSelect.appendChild(option);
+    });
   }
 
   filters.forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener('click', () => {
       activeFilter = button.dataset.filter;
-      filters.forEach((item) => item.classList.toggle("active", item === button));
+      filters.forEach((item) => item.classList.toggle('active', item === button));
       render();
     });
   });
@@ -93,7 +145,7 @@
   async function fetchJobs() {
     skeleton();
     try {
-      const response = await fetch("/api/careers");
+      const response = await fetch('/api/careers');
       const payload = await response.json();
       jobs = payload.data && payload.data.length ? payload.data : fallbackJobs;
     } catch (error) {

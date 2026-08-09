@@ -171,3 +171,212 @@ To run the application locally and test Netlify serverless functions:
     *   `EMAILJS_TEMPLATE_ID_JOB_NOTIFY`
     *   `EMAILJS_TEMPLATE_ID_JOB_CONFIRM`
 5.  **Click Deploy Site.** Netlify will automate the React compile build and host the static pages alongside serverless endpoints.
+
+---
+
+## GoDaddy hosting only: important limitation
+
+This project is built around Netlify Functions and is not a pure static-site-only app. The contact and career forms send email through serverless functions in `netlify/functions`, and those routes are not available on a plain GoDaddy static host.
+
+If the website is hosted only on GoDaddy, the backend must be moved to a real Node server or equivalent runtime because GoDaddy static hosting will not execute the Netlify Functions used here.
+
+### What this means in practice
+
+- The app can be hosted on Netlify as designed.
+- If you host only on GoDaddy, the APIs at `/api/contact`, `/api/careers`, and `/api/careers-apply` will not work unless you convert them into a Node/Express backend or move them to another compatible server host.
+- SMTP credentials must be stored in server environment variables, not in browser code.
+- The frontend can still be static on GoDaddy, but the email backend must be hosted elsewhere or rewritten as a Node server.
+
+### Recommended GoDaddy setup
+
+For a GoDaddy-only deployment, convert the Netlify Function logic into a Node server that exposes the same API paths:
+
+- `POST /api/contact`
+- `GET /api/careers`
+- `POST /api/careers-apply`
+
+This requires:
+
+1. A Node runtime compatible with the hosting plan or a VPS.
+2. A server entry point such as `server.js` that handles API routes.
+3. SMTP configuration in server environment variables.
+4. Frontend requests that continue hitting `/api/...` without requiring Netlify-specific deployment.
+
+### Summary
+
+The project is intended for Netlify deployment because the backend email functions are part of the Netlify architecture. For a GoDaddy-only hosting model, a Node server migration is required before the form system can work correctly.
+
+---
+
+## Full process to do it correctly
+
+There are 2 real paths for this project:
+
+1. Best path: deploy on Netlify
+2. GoDaddy-only path: convert this project into a Node server app first
+
+Because this project is already built around Netlify Functions, Netlify is the recommended and simplest deployment option. If you must use GoDaddy only, the project must be migrated to a Node backend before deployment.
+
+---
+
+## Option A: Recommended — Netlify deployment
+
+This project is already designed for Netlify.
+
+### Step 1: Push code to GitHub
+
+Push the repository to GitHub, then import it into Netlify.
+
+Repository example:
+
+- https://github.com/KrishnasaiBitra/ABC-Website
+
+### Step 2: Configure the Netlify project
+
+In the Netlify dashboard:
+
+- Site name: your project name
+- Build command: `npm run netlify-build`
+- Publish directory: `public`
+- Functions directory: `netlify/functions`
+
+These settings are already defined in this repository and should match the project structure.
+
+### Step 3: Add environment variables
+
+Add these values in Netlify → Site settings → Environment variables:
+
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `COMPANY_EMAIL`
+
+These variables are required because the email backend is in the serverless functions under `netlify/functions`.
+
+### Step 4: Deploy the site
+
+Click Deploy site.
+
+### Step 5: Test the live forms
+
+Open the deployed website and submit the contact form or career form.
+
+If Gmail accepts the message, the function sends it successfully. If it fails, the usual causes are:
+
+- wrong SMTP details
+- destination mailbox blocking or filtering mail
+- Google Workspace restrictions on automated outbound mail
+- missing Netlify environment variables
+
+---
+
+## Option B: GoDaddy-only hosting
+
+This is the path if your final host must be GoDaddy.
+
+### Important fact
+
+Your current project uses Netlify Functions, which do not run on plain GoDaddy static hosting.
+
+So the real process is:
+
+### Step 1: Convert the Netlify functions to a Node backend
+
+Move the logic from:
+
+- `netlify/functions/contact.js`
+- `netlify/functions/careers-apply.js`
+- `netlify/functions/careers.js`
+
+into a single Node backend server.
+
+The local Node server already present in this repo, `server.js`, is a good starting point.
+
+### Step 2: Create backend API routes
+
+Your Node server should expose the same routes as the current app:
+
+- `POST /api/contact`
+- `POST /api/careers-apply`
+- `GET /api/careers`
+
+### Step 3: Keep the frontend static
+
+The HTML pages in the `public` folder can still remain static on GoDaddy.
+
+However, all form submissions must call the Node API instead of Netlify Functions.
+
+### Step 4: Put SMTP values on the server
+
+Store these values in server environment variables instead of browser code:
+
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `COMPANY_EMAIL`
+
+Do not expose SMTP credentials in JavaScript on the frontend.
+
+### Step 5: Deploy the Node app to a compatible environment
+
+GoDaddy static hosting alone is not enough if you want backend APIs.
+
+You need one of these:
+
+- a GoDaddy VPS with Node support
+- another Node-capable hosting platform
+- or a server where Node can run continuously
+
+### Step 6: Upload the static frontend
+
+After the backend is working, upload the frontend static files to GoDaddy.
+
+### Step 7: Update DNS
+
+Point the domain to the GoDaddy hosting environment.
+
+### Step 8: Test everything
+
+Test the following after deployment:
+
+- contact form
+- career form
+- resume upload
+- email delivery
+- success and error states
+
+---
+
+## What I recommend for you
+
+Because this project was built as a Netlify app, the easiest and safest option is:
+
+- keep it on Netlify
+- use Netlify Functions
+- set the SMTP values in Netlify
+- deploy directly there
+
+If your requirement is strictly “must be on GoDaddy only,” then the project must be converted from Netlify Functions to a Node server architecture before deployment.
+
+---
+
+## Simple rule
+
+- Netlify hosting → works with the current project
+- GoDaddy static hosting only → does not work with the current project
+- GoDaddy + Node server → works after converting the backend
+
+---
+
+## Final conclusion
+
+This site is not a plain static website in terms of backend behavior. It includes email APIs and server-side processing, so deployment must match the app architecture.
+
+If you want the fastest, correct setup: use Netlify.
+
+If you want to force GoDaddy as the final host: first convert this app into a proper Node backend application and then deploy it on a GoDaddy-compatible Node environment.
+
+This is the correct implementation path for the project as it currently exists.
+

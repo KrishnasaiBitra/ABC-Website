@@ -1,382 +1,568 @@
-# Afnamtech Private Limited Website
+# Afnamtech Private Limited
+## Website Project Documentation
 
-Static company website for Afnamtech Private Limited, built with HTML, CSS, JavaScript, and Netlify serverless functions.
+- **Project:** Afnamtech Private Limited Company Website
+- **Architecture:** Static frontend + Node.js local server + Netlify Serverless Functions
+- **Email:** Nodemailer + SMTP
+- **Database:** No database integration is present in the supplied project
 
-## Stack
+This documentation is prepared from the supplied Afnamtech Private Limited website project and follows the structure and detail level of the provided ABC Solutions documentation example.
 
-- Frontend: static HTML, CSS, and JavaScript
-- Local dev server: Node.js
-- Serverless APIs: Netlify Functions
-- Email delivery: Nodemailer with SMTP
-- Build: esbuild via a cross-platform Node script
+---
 
-## Local setup
+## 1. Project Overview
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Copy the example environment file:
-   ```bash
-   copy .env.example .env
-   ```
-   On macOS/Linux use `cp .env.example .env`.
-3. Fill in your SMTP values in `.env`:
-   - `SMTP_HOST`
-   - `SMTP_PORT`
-   - `SMTP_USER`
-   - `SMTP_PASS`
-   - `COMPANY_EMAIL`
-4. Build the React widget bundle:
-   ```bash
-   npm run build
-   ```
-5. Start the local site:
-   ```bash
-   npm start
-   ```
-   The local server runs at `http://localhost:3000` by default.
+The Afnamtech Private Limited Website is a corporate web application designed to present the company's banking technology services, solutions, products, delivery capabilities, career opportunities, and contact channels. Visitors can browse company information, explore banking-focused solutions, view available job openings, submit contact enquiries, and apply for positions with an optional resume attachment.
 
-## SMTP configuration
+The supplied project is primarily a static website built with HTML, CSS, and JavaScript. Server-side functionality is implemented through Netlify Functions, while a lightweight Node.js HTTP server is included for local development. Email delivery is handled with Nodemailer over SMTP.
 
-This project sends contact and application emails using SMTP, not EmailJS.
+### Technology Stack
 
-Use a real Gmail App Password if you are using Gmail:
+| Layer | Technology / Component |
+|---|---|
+| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| Additional UI | React 19 components and an esbuild bundle |
+| Local backend | Node.js built-in HTTP server |
+| Serverless backend | Netlify Functions |
+| Email delivery | Nodemailer with SMTP |
+| Build tool | esbuild |
+| Environment configuration | dotenv / .env |
+| Testing | Node.js built-in test runner |
+| Deployment configuration | Netlify |
 
-1. Enable 2-Step Verification in your Google account.
-2. Create an App Password.
-3. Put the app password in `SMTP_PASS` without spaces.
-4. Keep `SMTP_USER` as the full Gmail address used to send mail.
+### Project Characteristics
 
-The `.env` file is never committed to source control.
+- Five primary public pages are included: Home, Our Story, Solutions, What We Offer, and Career.
+- The contact form sends a notification to the configured company mailbox and a confirmation to the visitor.
+- The career page retrieves job listings from a serverless API and submits applications through a serverless endpoint.
+- Career applications can include PDF, DOC, or DOCX resumes up to 5 MB.
+- No MongoDB, MySQL, PostgreSQL, or other database connection is present in the supplied project.
+- Job listings and solution data are currently defined in JavaScript arrays rather than stored in a database.
 
-## Upload restrictions
+---
 
-Resume uploads are allowed only for:
-- PDF
-- DOC
-- DOCX
+## 2. Website Pages
 
-Limits:
-- maximum file size: 5 MB
-- server-side validation is authoritative
-- requests with unsupported or malformed payloads are rejected
+### Home Page
+**File:** `public/index.html`
 
-## Anti-spam protection
+- Introduces Afnamtech Private Limited and its banking technology positioning.
+- Hero content includes 'Innovating Your Future', Digital Platform, and Artificial Intelligence messaging.
+- Presents products and banking capabilities including CRM, workforce/HRMS, digital banking, core banking, and data migration.
+- Contains case-study and delivery-story content.
+- Includes vision, mission, engagement models, leadership, partners, clients, and technology/tooling sections.
+- Provides the 'Get in touch' contact interaction and contact form.
 
-The contact and career APIs implement:
-- required field validation
-- maximum field lengths
-- honeypot rejection
-- request body size limits on the local Node server
-- rate limiting per client IP
-- 413 HTTP responses for oversized bodies
+### Our Story Page
+**File:** `public/our-story.html`
 
-## Netlify deployment
+- Presents the company story and positioning as an IT services partner for banks and financial institutions.
+- Contains a company timeline covering milestones from 2019 through 2025.
+- Uses JavaScript/IntersectionObserver behavior for milestone-related visual interaction.
 
-Set these values as environment variables in the Netlify dashboard:
+### Solutions Page
+**File:** `public/solutions.html`
 
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `COMPANY_EMAIL`
+- Presents six banking/financial-services solutions.
+- Solutions are AML, Ticketing System, ChatBot, HRMS (WS Workforce), Payment Automation, and CRM (WS CRM).
+- The page uses JavaScript to expand and collapse solution content.
 
-Build settings:
-- build command: `npm run netlify-build`
-- publish directory: `public`
-- functions directory: `netlify/functions`
+### What We Offer Page
+**File:** `public/what-we-offer.html`
 
-## Project structure
+- Presents three service pillars: Digital Banking Solutions, Core Banking Solutions, and Data Migration.
+- Includes technology/tooling information and engagement models such as Fixed Price and Time & Material.
 
-```text
-netlify/functions/   Serverless contact, careers, and application endpoints
-public/              Static site pages and front-end assets
-lib/                 Shared validation and company config helpers
-scripts/             Build script for cross-platform bundling
-tests/               Focused validation and API tests
-server.js            Local Node development server
+### Career Page
+**File:** `public/career.html`
+
+- Loads available jobs dynamically from `GET /api/careers`.
+- Provides category and work-mode filtering in the browser.
+- Provides an application form with name, email, phone, role, department, cover letter, and resume fields.
+- Submits applications to `POST /api/careers-apply`.
+
+---
+
+## 3. Solutions and Career Information
+
+### Solutions API Data
+
+| No. | Solution | Main Capabilities |
+|---|---|---|
+| 1 | AML (Anti-Money Laundering) | KYC/risk profiling, transaction monitoring, SAR, watchlist screening, case management, regulatory reporting |
+| 2 | Ticketing System | Audit/query workflows, SLA tracking, reports, timestamped tracking |
+| 3 | ChatBot | Mobile/web integration, 24x7 service, multi-channel and multi-language support, AI/ML, cloud/on-premise |
+| 4 | HRMS (WS Workforce) | Employee management, attendance/leave, payroll, recruitment, compliance, mobile access, analytics |
+| 5 | Payment Automation | Incoming credits, acknowledgements, returns, API integration, reconciliation, reporting |
+| 6 | CRM (WS CRM) | Customer information, communication history, sales pipeline, mobile access, role-based access, scalability |
+
+### Available Career Positions
+
+| Role | Department | Type | Location |
+|---|---|---|---|
+| Core Banking Integration Engineer | Engineering | Full-time | Dharmapuri (On-site) |
+| React Frontend Developer | Engineering | Full-time | Remote |
+| Business Analyst - Banking Domain | Banking | Full-time | Dharmapuri (On-site) |
+| HR Executive | HR | Full-time | Dharmapuri (On-site) |
+
+### Career API Response Structure
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "role": "React Frontend Developer",
+      "department": "Engineering",
+      "type": "Full-time",
+      "location": "Remote",
+      "isRemote": true,
+      "description": "...",
+      "requirements": ["React", "REST API integration", "CSS"]
+    }
+  ]
+}
 ```
 
-## Notes
+The job data is defined directly inside `netlify/functions/careers.js`. There is no database-backed job management system in the supplied project.
 
-## 📧 SMTP Email Configuration
+---
 
-The serverless backend uses **Nodemailer** to send notification and confirmation emails directly via SMTP (e.g. Gmail).
+## 4. Forms and Email Workflow
 
-### Step 1: Configure SMTP Variables
-Rename or copy `.env.example` to `.env` in the project root:
-```bash
+### Contact Form
+
+- **Location:** Home Page.
+- **Purpose:** Collect customer enquiries and messages.
+- **Frontend endpoint:** `POST /api/contact`.
+- **Required fields:** Full Name, Email, Subject, Message.
+- The server validates the request before sending any email.
+- A successful submission sends two emails: a company notification and a visitor confirmation.
+
+**Contact Email Flow**
+
+```
+Visitor
+   |
+   v
+Contact Form
+   |
+   | POST /api/contact
+   v
+Netlify Function: contact.js
+   |
+   +----> COMPANY_EMAIL
+   |       New Contact Enquiry
+   |
+   +----> Visitor Email
+           Confirmation Message
+```
+
+### Career Application Form
+
+- **Location:** Career Page.
+- **Purpose:** Collect candidate applications.
+- **Frontend endpoint:** `POST /api/careers-apply`.
+- **Required fields:** Full Name, Email, Phone, Role.
+- **Optional fields:** Department, Cover Letter, Resume.
+- Resume types accepted by server-side validation: PDF, DOC, DOCX.
+- Maximum resume size: 5 MB.
+- The resume is sent as an email attachment to the configured company mailbox.
+- A confirmation email is also sent to the applicant.
+
+**Career Application Email Flow**
+
+```
+Candidate
+   |
+   v
+Career Application Form
+   |
+   | POST /api/careers-apply
+   v
+Netlify Function: careers-apply.js
+   |
+   +----> COMPANY_EMAIL
+   |       Job Application + Resume
+   |
+   +----> Candidate Email
+           Application Received Confirmation
+```
+
+---
+
+## 5. SMTP Email Configuration
+
+The supplied project uses Nodemailer with SMTP. It does not use EmailJS in the current implementation.
+
+### Environment Variables
+
+| Variable | Purpose | Example |
+|---|---|---|
+| `SMTP_HOST` | SMTP server address | `smtp.gmail.com` |
+| `SMTP_PORT` | SMTP port | `587` |
+| `SMTP_USER` | Account used to send email | `your_gmail@gmail.com` |
+| `SMTP_PASS` | SMTP password or provider App Password | 16-character Gmail App Password |
+| `COMPANY_EMAIL` | Mailbox receiving company notifications/applications | `info@yourcompany.com` |
+
+### Example `.env` File
+
+```
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_gmail@gmail.com
+SMTP_PASS=your_16_character_app_password
+COMPANY_EMAIL=info@yourcompany.com
+```
+
+### Gmail App Password Setup
+
+- Enable 2-Step Verification on the Google account used for SMTP.
+- Create a Google App Password for the website/application.
+- Use the generated App Password as `SMTP_PASS`; for Gmail, do not use the normal account password for this configuration.
+- Keep the `.env` file private and never commit it to Git.
+
+### SMTP Transport
+
+```javascript
+const transporter = nodemailer.createTransport({
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  secure: SMTP_PORT === 465,
+  auth: {
+    user: SMTP_USER,
+    pass: SMTP_PASS
+  }
+});
+```
+
+---
+
+## 6. Running the Project Locally
+
+### Step 1: Install Dependencies
+
+```
+npm install
+```
+
+### Step 2: Create the Environment File
+
+```
+copy .env.example .env
+
+# macOS/Linux:
 cp .env.example .env
 ```
 
+### Step 3: Configure SMTP
 
-Open `.env` and fill in the values:
-*   `SMTP_HOST` — The address of your SMTP server (e.g. `smtp.gmail.com` for Gmail).
-*   `SMTP_PORT` — The SMTP port (defaults to `587`. If using SSL on port `465`, secure connection will be enabled automatically).
-*   `SMTP_USER` — The email address used to authenticate and send the mail (e.g. `example@gmail.com`).
-*   `SMTP_PASS` — The password or Google App Password (required for Gmail) corresponding to the email account.
-*   `COMPANY_EMAIL` — The target inbox where notifications and job applications will be forwarded (e.g. `info@whitestone.in`).
+Open `.env` and provide `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `COMPANY_EMAIL`.
 
-### Step 2: Set up Google App Password (If using Gmail)
-1. Go to your [Google Account settings](https://myaccount.google.com/).
-2. Enable **2-Step Verification** under Security.
-3. Under Security -> **App passwords**, generate a new App Password (select 'Other' and name it, e.g. `ABC Website`).
-4. Copy the 16-character code generated and paste it as the `SMTP_PASS` value in your `.env` file.
+### Step 4: Build the React Widget Bundle
 
-## ⚙️ Local Development
+```
+npm run build
+```
 
-To run the application locally and test Netlify serverless functions:
+### Step 5: Start the Local Server
 
-1.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-2.  **Configure environment variables:**
-    Copy `.env.example` to `.env` in the project root:
-    ```bash
-    cp .env.example .env
-    ```
-    Populate the variables in `.env` with your actual EmailJS keys and template IDs.
+```
+npm start
+```
 
-3.  **Compile React widgets:**
-    ```bash
-    npm run build
-    ```
-4.  **Run with Netlify CLI (Optional, for functions testing):**
-    If you have `netlify-cli` installed globally (`npm install -g netlify-cli`), you can start the development server mimicking Netlify environments:
-    ```bash
-    netlify dev
-    ```
-    This runs the frontend assets and starts local functions on `http://localhost:8888`.
+The local server uses port 3000 by default. Open:
 
----
+```
+http://localhost:3000
+```
 
+### Available npm Scripts
 
-## 🚀 Netlify Deployment
+| Command | Purpose |
+|---|---|
+| `npm install` | Install project dependencies |
+| `npm start` | Start the local Node.js HTTP server |
+| `npm run dev` | Start the local server in development mode |
+| `npm run build` | Bundle the React widget source with esbuild |
+| `npm run netlify-build` | Run the Netlify build command |
+| `npm run lint` | Run Node syntax checks on key backend files |
+| `npm test` | Run the Node.js test suite |
 
-1.  **Push your repository to GitHub** (make sure `.env` is ignored).
-2.  **Log in to Netlify** and select **Add New Site** → **Import from Git**.
-3.  **Select your repository** and configure the build settings:
-    *   **Build command:** `npm run netlify-build`
-    *   **Publish directory:** `public`
-    *   **Functions directory:** `netlify/functions`
-4.  **Set Environment Variables:**
-    Under **Site settings** → **Environment variables**, add the following keys from your `.env` configuration:
-    *   `EMAILJS_SERVICE_ID`
-    *   `EMAILJS_PUBLIC_KEY`
-    *   `EMAILJS_PRIVATE_KEY`
-    *   `EMAILJS_TEMPLATE_ID_COMPANY`
-    *   `EMAILJS_TEMPLATE_ID_CONFIRM`
-    *   `EMAILJS_TEMPLATE_ID_JOB_NOTIFY`
-    *   `EMAILJS_TEMPLATE_ID_JOB_CONFIRM`
-5.  **Click Deploy Site.** Netlify will automate the React compile build and host the static pages alongside serverless endpoints.
+### Local Routes
+
+| Route | Page |
+|---|---|
+| `/` | Home page |
+| `/our-story` | Our Story page |
+| `/solutions` | Solutions page |
+| `/what-we-offer` | What We Offer page |
+| `/career` | Career page |
 
 ---
 
-## GoDaddy hosting only: important limitation
+## 7. API Endpoints
 
-This project is built around Netlify Functions and is not a pure static-site-only app. The contact and career forms send email through serverless functions in `netlify/functions`, and those routes are not available on a plain GoDaddy static host.
+| Endpoint | Method | Purpose | Implementation |
+|---|---|---|---|
+| `/api/contact` | POST | Submit contact enquiry and send notification/confirmation emails | `netlify/functions/contact.js` |
+| `/api/careers` | GET | Retrieve available job openings | `netlify/functions/careers.js` |
+| `/api/solutions` | GET | Retrieve company solution data | `netlify/functions/solutions.js` |
+| `/api/careers-apply` | POST | Submit job application and optional resume attachment | `netlify/functions/careers-apply.js` |
 
-If the website is hosted only on GoDaddy, the backend must be moved to a real Node server or equivalent runtime because GoDaddy static hosting will not execute the Netlify Functions used here.
+### Netlify API Routing
 
-### What this means in practice
+The `netlify.toml` file maps the `/api/*` path pattern to Netlify Functions using a rewrite:
 
-- The app can be hosted on Netlify as designed.
-- If you host only on GoDaddy, the APIs at `/api/contact`, `/api/careers`, and `/api/careers-apply` will not work unless you convert them into a Node/Express backend or move them to another compatible server host.
-- SMTP credentials must be stored in server environment variables, not in browser code.
-- The frontend can still be static on GoDaddy, but the email backend must be hosted elsewhere or rewritten as a Node server.
+```toml
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+```
 
-### Recommended GoDaddy setup
+Therefore, the deployed Netlify application is designed to expose the function endpoints through the `/api` path.
 
-For a GoDaddy-only deployment, convert the Netlify Function logic into a Node server that exposes the same API paths:
+### Local API Support
 
-- `POST /api/contact`
-- `GET /api/careers`
-- `POST /api/careers-apply`
+The included `server.js` explicitly handles `/api/contact`, `/api/careers`, and `/api/careers-apply`. The local server does not contain an explicit `/api/solutions` route, even though the solutions Netlify Function exists. This should be considered during local testing.
 
-This requires:
+### Health Check
 
-1. A Node runtime compatible with the hosting plan or a VPS.
-2. A server entry point such as `server.js` that handles API routes.
-3. SMTP configuration in server environment variables.
-4. Frontend requests that continue hitting `/api/...` without requiring Netlify-specific deployment.
-
-### Summary
-
-The project is intended for Netlify deployment because the backend email functions are part of the Netlify architecture. For a GoDaddy-only hosting model, a Node server migration is required before the form system can work correctly.
+The supplied project does not define an `/api/health` endpoint. A health endpoint should not be documented as available unless one is added to the application.
 
 ---
 
-## Full process to do it correctly
+## 8. Security and Validation
 
-There are 2 real paths for this project:
+Shared validation is implemented in `lib/validation.js` and reused by the contact and career application functions.
 
-1. Best path: deploy on Netlify
-2. GoDaddy-only path: convert this project into a Node server app first
+| Protection | Implementation |
+|---|---|
+| HTML escaping | `escapeHtml()` protects generated email HTML from injected markup. |
+| Input normalization | `normalizeString()` trims values and applies maximum lengths. |
+| Email validation | `isEmailValid()` performs basic email format validation. |
+| Honeypot | A hidden website field is rejected when populated, helping detect simple bots. |
+| Rate limiting | 20 requests per 60 seconds per client IP in the in-process limiter. |
+| Request size | Local server limits request bodies to 5 MB. |
+| Resume validation | PDF, DOC, DOCX MIME types; maximum 5 MB. |
+| CORS | Allowed development origins are defined in `validation.js`. |
+| Security headers | Local static responses include `X-Frame-Options`, `X-Content-Type-Options` and `Referrer-Policy`. |
+| Credentials | SMTP credentials are read from environment variables rather than frontend code. |
 
-Because this project is already built around Netlify Functions, Netlify is the recommended and simplest deployment option. If you must use GoDaddy only, the project must be migrated to a Node backend before deployment.
+### Security Recommendations for Production
 
----
-
-## Option A: Recommended — Netlify deployment
-
-This project is already designed for Netlify.
-
-### Step 1: Push code to GitHub
-
-Push the repository to GitHub, then import it into Netlify.
-
-Repository example:
-
-- https://github.com/KrishnasaiBitra/ABC-Website
-
-### Step 2: Configure the Netlify project
-
-In the Netlify dashboard:
-
-- Site name: your project name
-- Build command: `npm run netlify-build`
-- Publish directory: `public`
-- Functions directory: `netlify/functions`
-
-These settings are already defined in this repository and should match the project structure.
-
-### Step 3: Add environment variables
-
-Add these values in Netlify → Site settings → Environment variables:
-
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `COMPANY_EMAIL`
-
-These variables are required because the email backend is in the serverless functions under `netlify/functions`.
-
-### Step 4: Deploy the site
-
-Click Deploy site.
-
-### Step 5: Test the live forms
-
-Open the deployed website and submit the contact form or career form.
-
-If Gmail accepts the message, the function sends it successfully. If it fails, the usual causes are:
-
-- wrong SMTP details
-- destination mailbox blocking or filtering mail
-- Google Workspace restrictions on automated outbound mail
-- missing Netlify environment variables
+- Keep `.env` out of source control and configure production secrets through the hosting provider.
+- Use an email App Password or provider-specific secure SMTP authentication where supported.
+- Consider centralized/distributed rate limiting for a high-traffic serverless deployment because the current limiter stores state in process memory.
+- Review upload validation and consider stronger file-content checks if resume uploads become a significant attack surface.
+- Review production CORS and security-header policy against the final domain and deployment architecture.
 
 ---
 
-## Option B: GoDaddy-only hosting
+## 9. Project Structure
 
-This is the path if your final host must be GoDaddy.
+```
+Afnamtech_Private_Limited-Website-main/
+|
++-- .env.example
++-- .gitignore
++-- README.md
++-- package.json
++-- package-lock.json
++-- deno.lock
++-- server.js
++-- test-server.js
++-- netlify.toml
+|
++-- lib/
+|   +-- company.js
+|   +-- validation.js
+|
++-- netlify/
+|   +-- functions/
+|       +-- contact.js
+|       +-- careers.js
+|       +-- solutions.js
+|       +-- careers-apply.js
+|
++-- public/
+|   +-- index.html
+|   +-- our-story.html
+|   +-- solutions.html
+|   +-- what-we-offer.html
+|   +-- career.html
+|   +-- assets/
+|   +-- css/
+|   +-- js/
+|   +-- react/
+|
++-- scripts/
+|   +-- build.mjs
+|
++-- tests/
+    +-- validation.test.js
+```
 
-### Important fact
+### Directory Summary
 
-Your current project uses Netlify Functions, which do not run on plain GoDaddy static hosting.
-
-So the real process is:
-
-### Step 1: Convert the Netlify functions to a Node backend
-
-Move the logic from:
-
-- `netlify/functions/contact.js`
-- `netlify/functions/careers-apply.js`
-- `netlify/functions/careers.js`
-
-into a single Node backend server.
-
-The local Node server already present in this repo, `server.js`, is a good starting point.
-
-### Step 2: Create backend API routes
-
-Your Node server should expose the same routes as the current app:
-
-- `POST /api/contact`
-- `POST /api/careers-apply`
-- `GET /api/careers`
-
-### Step 3: Keep the frontend static
-
-The HTML pages in the `public` folder can still remain static on GoDaddy.
-
-However, all form submissions must call the Node API instead of Netlify Functions.
-
-### Step 4: Put SMTP values on the server
-
-Store these values in server environment variables instead of browser code:
-
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `COMPANY_EMAIL`
-
-Do not expose SMTP credentials in JavaScript on the frontend.
-
-### Step 5: Deploy the Node app to a compatible environment
-
-GoDaddy static hosting alone is not enough if you want backend APIs.
-
-You need one of these:
-
-- a GoDaddy VPS with Node support
-- another Node-capable hosting platform
-- or a server where Node can run continuously
-
-### Step 6: Upload the static frontend
-
-After the backend is working, upload the frontend static files to GoDaddy.
-
-### Step 7: Update DNS
-
-Point the domain to the GoDaddy hosting environment.
-
-### Step 8: Test everything
-
-Test the following after deployment:
-
-- contact form
-- career form
-- resume upload
-- email delivery
-- success and error states
+| Directory/File | Responsibility |
+|---|---|
+| `public/` | Frontend pages, stylesheets, scripts, SVG assets, and React source |
+| `public/css/` | Global and page-specific CSS |
+| `public/js/` | Navigation, forms, page interactions, career loading, and animations |
+| `public/react/` | React component source for contact/career widgets |
+| `netlify/functions/` | Serverless API handlers |
+| `lib/` | Shared company configuration and validation utilities |
+| `scripts/` | Build automation for the React bundle |
+| `tests/` | Automated validation/API-focused tests |
+| `server.js` | Local static file server and local API adapter |
+| `netlify.toml` | Netlify build, publish, function, and redirect configuration |
+| `.env.example` | Template for SMTP environment variables |
 
 ---
 
-## What I recommend for you
+## 10. Detailed File Explanation
 
-Because this project was built as a Netlify app, the easiest and safest option is:
+### 1. `netlify/functions/contact.js`
+- Accepts POST requests for contact enquiries.
+- Parses and validates JSON input.
+- Rejects honeypot submissions and excessive request frequency.
+- Checks SMTP configuration.
+- Sends the enquiry to `COMPANY_EMAIL`.
+- Sends a confirmation message to the visitor.
 
-- keep it on Netlify
-- use Netlify Functions
-- set the SMTP values in Netlify
-- deploy directly there
+### 2. `netlify/functions/careers.js`
+- Contains the current four job definitions.
+- Returns the jobs as JSON with `success` and `data` properties.
+- Does not use a database.
 
-If your requirement is strictly “must be on GoDaddy only,” then the project must be converted from Netlify Functions to a Node server architecture before deployment.
+### 3. `netlify/functions/solutions.js`
+- Contains six solution definitions.
+- Returns solution information as JSON.
+- Does not use a database.
+
+### 4. `netlify/functions/careers-apply.js`
+- Accepts job application submissions.
+- Validates applicant fields.
+- Validates an optional Base64 resume upload.
+- Adds the resume as an email attachment.
+- Sends the application to `COMPANY_EMAIL`.
+- Sends an application-received confirmation to the candidate.
+
+### 5. `lib/company.js`
+- Stores company name, default company email, address, phone numbers, and social links.
+- Provides centralized company configuration values.
+
+### 6. `lib/validation.js`
+- Defines maximum input lengths and allowed origins.
+- Provides HTML escaping, normalization, email validation, client-IP extraction, CORS headers, JSON responses, rate limiting, and resume parsing.
 
 ---
 
-## Simple rule
+## 11. Frontend, Build System, and Testing
 
-- Netlify hosting → works with the current project
-- GoDaddy static hosting only → does not work with the current project
-- GoDaddy + Node server → works after converting the backend
+### Frontend JavaScript
+
+| File | Main Responsibility |
+|---|---|
+| `public/js/form.js` | Contact/career form submission, validation, resume Base64 conversion, popup behavior and related UI helpers |
+| `public/js/nav.js` | Navigation, mobile menu/drawer, active navigation and interaction behavior |
+| `public/js/home.js` | Home-page slider and timed slide changes |
+| `public/js/solutions.js` | Solution card expand/collapse interaction |
+| `public/js/what-we-offer.js` | Tool/card interactions and counters |
+| `public/js/our-story.js` | Milestone/scroll-based visual behavior |
+| `public/js/career.js` | Fetches `/api/careers`, filters jobs and controls application UI |
+
+### CSS Organization
+
+| File | Purpose |
+|---|---|
+| `global.css` | Shared layout, typography, navigation, buttons, common components and responsive behavior |
+| `home.css` | Home-page-specific styling |
+| `our-story.css` | Our Story page styling |
+| `solutions.css` | Solutions page styling |
+| `what-we-offer.css` | What We Offer page styling |
+| `career.css` | Career page styling |
+
+### React and Build System
+
+The project also contains React 19 components under `public/react/`. The `scripts/build.mjs` file uses esbuild to bundle `public/react/index.jsx` into `public/js/react-widgets.js`. The main HTML pages currently rely on their vanilla JavaScript files for the visible site flows, so the React source represents an additional implementation layer that should be kept only if it is intentionally used.
+
+### Testing
+
+The supplied `tests/validation.test.js` file contains seven focused tests covering HTML escaping, normalization, email validation, JSON response headers, PDF upload parsing, unsupported upload rejection, and rate limiting. These tests are designed to run with the Node.js built-in test runner.
 
 ---
 
-## Final conclusion
+## 12. Deployment Process
 
-This site is not a plain static website in terms of backend behavior. It includes email APIs and server-side processing, so deployment must match the app architecture.
+The project is configured for Netlify deployment.
 
-If you want the fastest, correct setup: use Netlify.
+### Step 1: Push Project to GitHub
 
-If you want to force GoDaddy as the final host: first convert this app into a proper Node backend application and then deploy it on a GoDaddy-compatible Node environment.
+```
+git init
+git add .
+git commit -m "Initial Commit - Afnamtech Website"
+git branch -M main
+git remote add origin <repository-url>
+git push -u origin main
+```
 
-This is the correct implementation path for the project as it currently exists.
+### Step 2: Configure Netlify
 
+- Import the GitHub repository into Netlify.
+- Build command: `npm run netlify-build`.
+- Publish directory: `public`.
+- Functions directory: `netlify/functions`.
+
+### Step 3: Add Environment Variables
+
+| Variable | Value |
+|---|---|
+| `SMTP_HOST` | SMTP provider host |
+| `SMTP_PORT` | SMTP provider port |
+| `SMTP_USER` | SMTP sending account |
+| `SMTP_PASS` | SMTP password/App Password |
+| `COMPANY_EMAIL` | Company notification mailbox |
+
+### Step 4: Deploy and Verify
+
+- Open the deployed website.
+- Verify all five pages and navigation routes.
+- Open the Career page and confirm jobs load.
+- Submit a contact enquiry and verify the company notification and visitor confirmation.
+- Submit a career application and verify the company application email and candidate confirmation.
+- Test a valid resume and invalid/oversized upload cases.
+
+### Live Application Information
+
+No production website URL is defined in the supplied project files. This documentation therefore does not invent or claim a live URL.
+
+---
+
+## 13. Implementation Notes and Conclusion
+
+### Important Implementation Notes
+
+- The project does not contain a database layer. Contact enquiries and career applications are delivered through email rather than stored in a database.
+- The current job listings and solution catalog are static JavaScript data.
+- The Netlify configuration provides the intended serverless deployment path.
+- The local Node server reuses the Netlify function handlers for contact, careers, and career applications.
+- The solutions Netlify Function exists, but the local server does not explicitly map `/api/solutions`.
+- The project contains both vanilla JavaScript and React implementations. The visible HTML pages primarily use the vanilla implementation.
+- The repository includes `test-server.js`, but the main local server is `server.js`.
+
+### Recommended Final Verification
+
+- Confirm the final company email address and SMTP account.
+- Confirm the final company address, phone numbers, and social-media links.
+- Remove any unused or duplicate frontend implementation if React is not required.
+- Add a dedicated health endpoint only if operational monitoring is needed.
+- Consider centralized rate limiting for production-scale traffic.
+- Perform a complete mobile, accessibility, link, form, and deployment test before launch.
+
+### Conclusion
+
+The Afnamtech Private Limited Website is a corporate banking-technology website with a static frontend, a lightweight Node.js local server, and Netlify serverless functions for backend operations. Its primary dynamic capabilities are contact enquiries, career listing retrieval, and job application processing with email notifications and confirmations. The project includes reusable validation utilities, basic anti-spam protections, resume validation, SMTP-based email delivery, Netlify deployment configuration, and automated tests. The supplied source is suitable as a foundation for deployment after the final configuration, content, route, and production-security checks are completed.

@@ -20,76 +20,6 @@
     });
   }
 
-  // Create Left & Right Side Navigation Bars
-  function createSideNavs() {
-    if (document.getElementById("side-nav-left")) return;
-
-    // Define all 5 navigation items
-    const navItems = [
-      {
-        href: "/",
-        label: "Home",
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`
-      },
-      {
-        href: "/our-story",
-        label: "Our Story",
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`
-      },
-      {
-        href: "/solutions",
-        label: "Solutions",
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="15" x2="23" y2="15"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="15" x2="4" y2="15"></line></svg>`
-      },
-      {
-        href: "/what-we-offer",
-        label: "What We Offer",
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`
-      },
-      {
-        href: "/career",
-        label: "Career",
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`
-      }
-    ];
-
-    // Find label of active item to show in vertical name mode
-    const activeItem = navItems.find(item => {
-      const normalizedLink = normalizePath(new URL(item.href, window.location.origin).pathname);
-      return normalizedLink === normalizedCurrent || (normalizedCurrent === "/" && normalizedLink === "/index");
-    });
-    const activeLabel = activeItem ? activeItem.label : "Home";
-
-    function buildSideNav(id, positionClass, items) {
-      const nav = document.createElement("nav");
-      nav.id = id;
-      nav.className = `side-nav ${positionClass}`;
-      nav.setAttribute("aria-label", `${positionClass.replace("side-nav-", "")} side navigation`);
-
-      items.forEach(item => {
-        const a = document.createElement("a");
-        a.href = item.href;
-        a.className = "side-nav-item";
-        a.innerHTML = `
-          ${item.icon}
-          <span class="side-nav-tooltip">${item.label}</span>
-        `;
-        nav.appendChild(a);
-      });
-
-      // Add name overlay
-      const activeNameDiv = document.createElement("div");
-      activeNameDiv.className = "side-nav-active-name";
-      activeNameDiv.innerHTML = `<span>${activeLabel}</span>`;
-      nav.appendChild(activeNameDiv);
-
-      document.body.appendChild(nav);
-    }
-
-    // Build the left side nav with all 5 links
-    buildSideNav("side-nav-left", "side-nav-left", navItems);
-  }
-
   // Assign section IDs dynamically on load
   function assignSectionIds() {
     const path = normalizedCurrent;
@@ -273,11 +203,10 @@
 
   // Initialize features
   assignSectionIds();
-  createSideNavs();
   createRightMenuDrawer();
 
   // Set active classes and navigation event listeners
-  document.querySelectorAll(".nav-links a, .side-nav-item").forEach((link) => {
+  document.querySelectorAll(".nav-links a").forEach((link) => {
     const normalizedLink = normalizePath(new URL(link.href).pathname);
     
     if (normalizedLink === normalizedCurrent || (normalizedCurrent === "/" && normalizedLink === "/index")) {
